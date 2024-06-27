@@ -1,5 +1,5 @@
 {
-  plugins.lightline = {
+  plugins.fugitive = {
     enable = true;
   };
 }
