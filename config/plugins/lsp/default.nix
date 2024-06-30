@@ -9,7 +9,7 @@
     lsp = {
       enable = true;
       servers = {
-        bashls.enable = true;
+        #bashls.enable = true;
         nixd.enable = true;
       };
       keymaps.lspBuf = {
