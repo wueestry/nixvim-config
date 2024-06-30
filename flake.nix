@@ -5,6 +5,11 @@
     flake-utils.url = "github:numtide/flake-utils";
 
     nixvim.url = "github:nix-community/nixvim";
+
+    pre-commit-hooks = {
+      url = "github:cachix/pre-commit-hooks.nix";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
   outputs = {
@@ -12,6 +17,7 @@
     nixpkgs,
     nixvim,
     flake-utils,
+    pre-commit-hooks,
     ...
   } @ inputs: let
     config = import ./config; # import the module directly
@@ -32,6 +38,12 @@
           inherit nvim;
           name = "My nixvim configuration";
         };
+	pre-commit-check = pre-commit-hooks.lib.${system}.run {
+          src = ./.;
+            hooks = {
+              alejandra.enable = true;
+            };
+	};
       };
 
       packages = {
@@ -39,6 +51,13 @@
         default = nvim;
       };
 
-      # devShells.default = import ./shell.nix { inherit pkgs; };
+      devShells.${system} = {
+          default = pkgs.mkShell {
+            inherit (self.checks.${system}.pre-commit-check) shellHook;
+            buildInputs = with pkgs; [
+              alejandra
+            ];
+          };
+        };
     });
 }
